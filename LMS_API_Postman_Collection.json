@@ -1,0 +1,384 @@
+ {
+  "info": {
+    "name": "LMS API Tests",
+    "description": "Полный набор тестов для LMS API на Django + DRF",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "GET - List all courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/courses/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "courses", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST - Create course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Python для веб-разработки\",\n  \"description\": \"Изучение Python для создания веб-приложений\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/courses/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "courses", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET - Course detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/courses/1/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "courses", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT - Update course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Django для начинающих (обновлено)\",\n  \"description\": \"Обновленное описание курса\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/courses/1/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "courses", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH - Partial update course",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Django для новичков\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/courses/1/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "courses", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE - Delete course",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/courses/1/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "courses", "1", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lessons",
+      "item": [
+        {
+          "name": "GET - List all lessons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/lessons/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "lessons", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST - Create lesson",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Новый урок\",\n  \"description\": \"Описание урока\",\n  \"course\": 1\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/lessons/create/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "lessons", "create", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET - Lesson detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/lessons/1/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "lessons", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT - Update lesson",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Введение в Django (обновлено)\",\n  \"description\": \"Обновленное описание\",\n  \"course\": 1\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/lessons/1/update/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "lessons", "1", "update", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH - Partial update lesson",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Введение в Django (новое название)\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/lessons/1/update/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "lessons", "1", "update", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE - Delete lesson",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/lessons/1/delete/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "lessons", "1", "delete", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET - List all users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/users/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "users", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST - Create user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@test.com\",\n  \"username\": \"newuser\",\n  \"first_name\": \"Новый\",\n  \"last_name\": \"Пользователь\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/users/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "users", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET - User profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/users/1/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "users", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT - Update user profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"updated@test.com\",\n  \"username\": \"updateduser\",\n  \"first_name\": \"Обновленное\",\n  \"last_name\": \"Имя\",\n  \"phone\": \"+7-999-123-45-67\",\n  \"city\": \"Москва\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/users/1/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "users", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH - Partial update user profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Иван\",\n  \"city\": \"Санкт-Петербург\",\n  \"phone\": \"+7-800-555-35-35\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/users/1/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "users", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE - Delete user",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/users/1/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "users", "1", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
