@@ -21,10 +21,10 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-n**nxjsre@z8r0itg)^=!7u8bb$y4l+_f!+xk5udte*0m$c%*7'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-n**nxjsre@z8r0itg)^=!7u8bb$y4l+_f!+xk5udte*0m$c%*7')
 
-# SECURITY WARNING: don't run with debug turned on in production! 
-DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'users',
     'materials',
 ]
 
@@ -84,7 +85,7 @@ POSTGRES_CONFIG = {
     'PORT': os.getenv('POSTGRES_PORT', '5432'),
 }
 
-if os.getenv('USE_POSTGRES', 'false').lower() == 'true':
+if os.getenv('USE_POSTGRES', 'true').lower() == 'true':
     DATABASES = {'default': POSTGRES_CONFIG}
 else:
     DATABASES = {
@@ -131,7 +132,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-AUTH_USER_MODEL = 'materials.User'
+AUTH_USER_MODEL = 'users.User'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email

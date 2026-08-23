@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Course, Lesson, User
+from .models import Course, Lesson
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -19,8 +19,3 @@ class LessonSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = ('id', 'title', 'description', 'preview', 'video_url', 'course')
 
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'phone', 'city', 'avatar')

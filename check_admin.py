@@ -4,7 +4,7 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
-from materials.models import User
+from users.models import User
 
 # Проверяем, есть ли суперпользователь
 admin_exists = User.objects.filter(is_superuser=True).exists()

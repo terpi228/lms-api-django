@@ -1,8 +1,7 @@
 from rest_framework import generics, viewsets
-from rest_framework.response import Response
 
-from .models import Course, Lesson, User
-from .serializers import CourseSerializer, LessonSerializer, UserSerializer
+from .models import Course, Lesson
+from .serializers import CourseSerializer, LessonSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -34,7 +33,3 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
 
-
-class UserProfileViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer

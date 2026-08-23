@@ -4,7 +4,8 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
-from materials.models import User, Course, Lesson
+from materials.models import Course, Lesson
+from users.models import User
 
 # Создаём тестового пользователя если его нет
 user, created = User.objects.get_or_create(

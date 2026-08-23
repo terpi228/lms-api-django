@@ -8,12 +8,10 @@ from .views import (
     LessonListAPIView,
     LessonRetrieveAPIView,
     LessonUpdateAPIView,
-    UserProfileViewSet,
 )
 
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet, basename='course')
-router.register(r'users', UserProfileViewSet, basename='user')
 
 urlpatterns = [
     path('lessons/', LessonListAPIView.as_view(), name='lesson-list'),
