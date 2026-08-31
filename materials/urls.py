@@ -1,5 +1,6 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
+from users.views import PaymentViewSet
 
 from .views import (
     CourseViewSet,
@@ -12,6 +13,7 @@ from .views import (
 
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet, basename='course')
+router.register(r'payments', PaymentViewSet, basename='payment')
 
 urlpatterns = [
     path('lessons/', LessonListAPIView.as_view(), name='lesson-list'),

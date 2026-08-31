@@ -1,7 +1,34 @@
 from django.conf import settings
 from django.test import SimpleTestCase
+from rest_framework.test import APITestCase
+
+from materials.models import Course, Lesson
+
+from .models import Payment, User
 
 
 class UserAppConfigurationTest(SimpleTestCase):
     def test_custom_user_model_is_configured_in_users_app(self):
         self.assertEqual(settings.AUTH_USER_MODEL, 'users.User')
+
+
+class PaymentAPITest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(email='user@example.com', username='user', password='password')
+        self.course = Course.objects.create(title='Django')
+        self.lesson = Lesson.objects.create(course=self.course, title='Serializers')
+        Payment.objects.create(user=self.user, paid_course=self.course, amount='1000.00', payment_method='transfer')
+        Payment.objects.create(user=self.user, paid_lesson=self.lesson, amount='300.00', payment_method='cash')
+
+    def test_payment_list_supports_filtering_and_ordering(self):
+        response = self.client.get('/api/payments/', {'paid_course': self.course.id, 'ordering': 'payment_date'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['paid_course'], self.course.id)
+
+    def test_user_detail_returns_payment_history(self):
+        response = self.client.get(f'/api/users/{self.user.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['payments']), 2)
