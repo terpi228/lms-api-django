@@ -1,3 +1,5 @@
+#config/urls.py
+
 """
 URL configuration for config project.
 
@@ -17,10 +19,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/api/', permanent=False), name='index'),
     path('admin/', admin.site.urls),
     path('api/', include('materials.urls')),
     path('api/', include('users.urls')),
+    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/refresh/', TokenRefreshView.as_view, name='token_refresh'),
+
+
 ]
+

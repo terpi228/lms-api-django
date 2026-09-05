@@ -1,26 +1,13 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from users.views import PaymentViewSet
-
-from .views import (
-    CourseViewSet,
-    LessonCreateAPIView,
-    LessonDestroyAPIView,
-    LessonListAPIView,
-    LessonRetrieveAPIView,
-    LessonUpdateAPIView,
-)
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from .views import CourseViewSet, LessonViewSet
 
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet, basename='course')
-router.register(r'payments', PaymentViewSet, basename='payment')
+router.register(r'lessons', LessonViewSet, basename='lesson')
 
 urlpatterns = [
-    path('lessons/', LessonListAPIView.as_view(), name='lesson-list'),
-    path('lessons/create/', LessonCreateAPIView.as_view(), name='lesson-create'),
-    path('lessons/<int:pk>/', LessonRetrieveAPIView.as_view(), name='lesson-detail'),
-    path('lessons/<int:pk>/update/', LessonUpdateAPIView.as_view(), name='lesson-update'),
-    path('lessons/<int:pk>/delete/', LessonDestroyAPIView.as_view(), name='lesson-delete'),
-]
-
-urlpatterns += router.urls
+    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+] + router.urls

@@ -1,312 +1,257 @@
+
+
+
 # LMS (Learning Management System) - Django + DRF
 
-## 📋 Описание проекта
-
-Полнофункциональная Learning Management System (LMS) на Django с Django REST Framework, включающая:
-- Управление курсами (CRUD)
-- Управление уроками (CRUD)
-- Управление пользователями (CRUD)
-- Кастомную модель пользователя на базе `AbstractBaseUser`
-- REST API эндпоинты для всех операций
+Учебный проект по созданию API для системы управления курсами и уроками с использованием Django REST Framework и JWT-аутентификации.
 
 ---
 
-## ✅ Выполненные требования задания
+## 📋 Содержание
 
-### Основные требования:
-- [x] Создан новый Django-проект
-- [x] Подключен Django REST Framework в настройках проекта
-- [x] Созданы модели: User (кастомная на AbstractBaseUser), Course, Lesson
-- [x] Реализованы CRUD операции для курсов и уроков
-- [x] Все эндпоинты протестированы
-
-### Дополнительные требования:
-- [x] Реализован эндпоинт для редактирования профиля пользователя (PATCH /api/users/{id}/)
-- [x] Возможность частичного обновления профиля (PATCH запросы)
-
----
-
-## 📦 Установленные зависимости
-
-```
-Django==6.1
-djangorestframework==3.18.0
-Pillow==11.2.0
-psycopg2==2.9.10
-python-dotenv==1.0.1
-```
+- [Основные возможности](#основные-возможности)
+- [Технологии](#технологии)
+- [Установка и запуск](#установка-и-запуск)
+- [Переменные окружения](#переменные-окружения)
+- [API Эндпоинты](#api-эндпоинты)
+  - [Пользователи](#пользователи)
+  - [Курсы](#курсы)
+  - [Уроки](#уроки)
+  - [Платежи](#платежи)
+  - [JWT-токены](#jwt-токены)
+- [Права доступа](#права-доступа)
+- [Тестирование в Postman](#тестирование-в-postman)
+- [Скрипты для заполнения базы](#скрипты-для-заполнения-базы)
+- [Разработчик](#разработчик)
 
 ---
 
-## 🗂️ Структура проекта
+## Основные возможности
 
-```
-Vise-sets_generics/
-├── config/                 # Основной конфиг проекта
-│   ├── settings.py        # Настройки Django (DRF, БД, INSTALLED_APPS)
-│   ├── urls.py            # Маршруты API
-│   └── wsgi.py
-├── materials/             # Основное приложение
-│   ├── models.py          # Модели: User, Course, Lesson
-│   ├── serializers.py     # DRF сериализаторы
-│   ├── views.py           # API представления (ViewSets и APIViews)
-│   ├── urls.py            # URL маршруты приложения
-│   └── migrations/        # Миграции БД
-├── .env                   # Переменные окружения
-├── manage.py              # Django CLI
-└── check_admin.py         # Скрипт для проверки админа
-└── load_data.py           # Скрипт для загрузки тестовых данных
-└── POSTMAN_TESTING.md     # Документация по тестированию
-└── LMS_API_Postman_Collection.json  # Postman коллекция
-```
+- Регистрация и аутентификация пользователей (JWT).
+- CRUD для курсов и уроков.
+- Разграничение прав доступа:
+  - **Обычные пользователи** — работают только со своими курсами/уроками.
+  - **Модераторы** (группа `moderators`) — просматривают и редактируют **любые** курсы/уроки, но не могут создавать и удалять.
+- Автоматическая привязка владельца (`owner`) при создании объектов.
+- Фильтрация и сортировка платежей.
+- Кастомная модель пользователя (email как логин).
 
 ---
 
-## 🗄️ Модели данных
+## Технологии
 
-### User (Кастомная модель пользователя)
-```python
-class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
-    username = models.CharField(unique=True)
-    first_name = models.CharField()
-    last_name = models.CharField()
-    phone = models.CharField()
-    city = models.CharField()
-    avatar = models.ImageField()
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
-```
-
-### Course
-```python
-class Course(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-```
-
-### Lesson
-```python
-class Lesson(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-```
+- Python 3.14+
+- Django 6.1
+- Django REST Framework 3.18
+- djangorestframework-simplejwt (JWT)
+- django-filter
+- PostgreSQL (по умолчанию) / SQLite (опционально)
+- Pillow (для работы с изображениями)
+- python-dotenv
 
 ---
 
-## 🚀 Быстрый старт
+## Установка и запуск
 
-### 1. Установка зависимостей
+### 1. Клонирование репозитория
 ```bash
-# Если виртуальное окружение ещё не создано:
+git clone <url-репозитория>
+cd Vise-sets_generics
+```
+
+### 2. Создание и активация виртуального окружения
+```bash
 python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# Linux/Mac
+source .venv/bin/activate
+```
 
-# Активация виртуального окружения:
-.\.venv\Scripts\activate  # Windows
-source .venv/bin/activate # Linux/Mac
-
-# Установка зависимостей:
+### 3. Установка зависимостей
+```bash
 pip install -r requirements.txt
 ```
 
-### 2. Подготовка БД
+### 4. Настройка переменных окружения
+Создай файл `.env` в корне проекта со следующим содержимым (пример):
+```env
+SECRET_KEY=ваш-секретный-ключ
+DEBUG=True
+USE_POSTGRES=True
+POSTGRES_DB=skypro_lms
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=ваш_пароль
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+```
+
+Если не хочешь использовать PostgreSQL, установи `USE_POSTGRES=False` — будет использоваться SQLite.
+
+### 5. Применение миграций
 ```bash
-# Создание миграций
-python manage.py makemigrations
-
-# Применение миграций
 python manage.py migrate
+```
 
-# Создание суперпользователя
+### 6. Создание суперпользователя
+```bash
 python manage.py createsuperuser
+```
 
-# Загрузка тестовых данных
+### 7. Загрузка тестовых данных (опционально)
+```bash
 python load_data.py
 ```
 
-### 3. Запуск сервера
+### 8. Запуск сервера
 ```bash
 python manage.py runserver
 ```
 
-Сервер будет доступен по адресу: **http://localhost:8000/api/**
+После запуска API будет доступно по адресу: `http://localhost:8000/api/`
 
 ---
 
-## 📝 REST API Эндпоинты
+## Переменные окружения
 
-### Курсы (Courses)
-| Метод | URL | Описание |
-|-------|-----|---------|
-| GET | `/api/courses/` | Получить все курсы |
-| POST | `/api/courses/` | Создать новый курс |
-| GET | `/api/courses/{id}/` | Получить курс по ID |
-| PUT | `/api/courses/{id}/` | Полное обновление курса |
-| PATCH | `/api/courses/{id}/` | Частичное обновление курса |
-| DELETE | `/api/courses/{id}/` | Удалить курс |
-
-### Уроки (Lessons)
-| Метод | URL | Описание |
-|-------|-----|---------|
-| GET | `/api/lessons/` | Получить все уроки |
-| POST | `/api/lessons/create/` | Создать новый урок |
-| GET | `/api/lessons/{id}/` | Получить урок по ID |
-| PUT | `/api/lessons/{id}/update/` | Полное обновление урока |
-| PATCH | `/api/lessons/{id}/update/` | Частичное обновление урока |
-| DELETE | `/api/lessons/{id}/delete/` | Удалить урок |
-
-### Пользователи (Users)
-| Метод | URL | Описание |
-|-------|-----|---------|
-| GET | `/api/users/` | Получить всех пользователей |
-| POST | `/api/users/` | Создать нового пользователя |
-| GET | `/api/users/{id}/` | Получить профиль пользователя |
-| PUT | `/api/users/{id}/` | Полное обновление профиля |
-| PATCH | `/api/users/{id}/` | Частичное обновление профиля |
-| DELETE | `/api/users/{id}/` | Удалить пользователя |
+| Переменная | Описание | По умолчанию |
+|------------|----------|--------------|
+| `SECRET_KEY` | Секретный ключ Django | обязательно для продакшена |
+| `DEBUG` | Режим отладки | `True` |
+| `USE_POSTGRES` | Использовать PostgreSQL (`True`/`False`) | `True` |
+| `POSTGRES_DB` | Имя базы данных | `skypro_lms` |
+| `POSTGRES_USER` | Пользователь БД | `postgres` |
+| `POSTGRES_PASSWORD` | Пароль БД | `postgres` |
+| `POSTGRES_HOST` | Хост БД | `localhost` |
+| `POSTGRES_PORT` | Порт БД | `5432` |
 
 ---
 
-## 🧪 Тестирование в Postman
+## API Эндпоинты
 
-### Импорт коллекции Postman:
-1. Откройте Postman
-2. Нажмите **Import** → выберите файл `LMS_API_Postman_Collection.json`
-3. Используйте готовые примеры для тестирования
+Все эндпоинты возвращают JSON. Для защищённых эндпоинтов требуется передавать токен в заголовке:
 
-### Альтернатива - ручное тестирование:
-Подробные инструкции по всем эндпоинтам см. в файле `POSTMAN_TESTING.md`
-
----
-
-## 🔑 Учетные данные для тестирования
-
-**Администратор:**
-- Email: `admin@test.com`
-- Password: `admin123`
-
-**Тестовый пользователь:**
-- Email: `user@test.com`
-- Password: `test123`
-
-**Тестовые данные:**
-- 3 готовых курса
-- 9 готовых уроков (по 3 на каждый курс)
-- 2 пользователя (admin и user)
-
----
-
-## 📄 Примеры запросов
-
-### Создание курса
-```bash
-curl -X POST http://localhost:8000/api/courses/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Django для начинающих",
-    "description": "Полный курс Django"
-  }'
+```
+Authorization: Bearer <access_token>
 ```
 
-### Обновление профиля пользователя (Частичное)
-```bash
-curl -X PATCH http://localhost:8000/api/users/1/ \
-  -H "Content-Type: application/json" \
-  -d '{
+### Пользователи
+
+| Метод | URL | Описание | Доступ |
+|-------|-----|----------|--------|
+| POST | `/api/users/` | Регистрация нового пользователя | Все |
+| GET | `/api/users/` | Список пользователей (только для админов) | Только админ |
+| GET | `/api/users/{id}/` | Профиль пользователя | Авторизованные |
+| PUT/PATCH | `/api/users/{id}/` | Обновление профиля | Владелец |
+| DELETE | `/api/users/{id}/` | Удаление пользователя | Только админ |
+
+**Пример регистрации:**
+```json
+POST /api/users/
+{
+    "email": "user@example.com",
+    "username": "user123",
+    "password": "securepass",
     "first_name": "Иван",
-    "city": "Москва"
-  }'
-```
-
-### Получение всех уроков
-```bash
-curl http://localhost:8000/api/lessons/
-```
-
----
-
-## ⚙️ Конфигурация базы данных
-
-### По умолчанию используется SQLite:
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "last_name": "Иванов"
 }
 ```
 
-### Для использования PostgreSQL:
-1. Добавьте в `.env` файл:
-```
-USE_POSTGRES=True
-DB_NAME=lms_db
-DB_USER=postgres
-DB_PASSWORD=ваш_пароль
-DB_HOST=localhost
-DB_PORT=5432
+### Курсы
+
+| Метод | URL | Описание |
+|-------|-----|----------|
+| GET | `/api/courses/` | Список курсов (для модератора — все, для остальных — свои) |
+| POST | `/api/courses/` | Создание курса (только не модератор) |
+| GET | `/api/courses/{id}/` | Детали курса с вложенными уроками |
+| PUT/PATCH | `/api/courses/{id}/` | Обновление (модератор или владелец) |
+| DELETE | `/api/courses/{id}/` | Удаление (только владелец и не модератор) |
+
+### Уроки
+
+| Метод | URL | Описание |
+|-------|-----|----------|
+| GET | `/api/lessons/` | Список уроков (фильтрация по владельцу) |
+| POST | `/api/lessons/` | Создание урока (только не модератор) |
+| GET | `/api/lessons/{id}/` | Детали урока |
+| PUT/PATCH | `/api/lessons/{id}/` | Обновление (модератор или владелец) |
+| DELETE | `/api/lessons/{id}/` | Удаление (только владелец и не модератор) |
+
+### Платежи
+
+| Метод | URL | Описание |
+|-------|-----|----------|
+| GET | `/api/payments/` | Список платежей (с фильтрацией и сортировкой) |
+| POST | `/api/payments/` | Создание платежа |
+
+**Фильтры:** `paid_course`, `paid_lesson`, `payment_method`  
+**Сортировка:** `ordering=payment_date` (по умолчанию — по убыванию даты)
+
+### JWT-токены
+
+| Метод | URL | Описание |
+|-------|-----|----------|
+| POST | `/api/login/` | Получение `access` и `refresh` токенов |
+| POST | `/api/refresh/` | Обновление `access` токена по `refresh` |
+
+**Пример логина:**
+```json
+POST /api/login/
+{
+    "username": "user@example.com",  // поле username, но передаётся email
+    "password": "securepass"
+}
 ```
 
-2. Убедитесь, что установлен `psycopg2`:
+**Пример обновления токена:**
+```json
+POST /api/refresh/
+{
+    "refresh": "ваш_refresh_токен"
+}
+```
+
+---
+
+## Права доступа
+
+- **IsAuthenticated** — требуется авторизация.
+- **IsModer** — пользователь состоит в группе `moderators`.
+- **IsOwner** — пользователь является владельцем объекта (поле `owner`).
+
+Комбинации:
+- `[IsAuthenticated(), ~IsModer()]` — только авторизованные, кроме модераторов.
+- `[IsAuthenticated(), IsModer() | IsOwner()]` — авторизованные и (модератор ИЛИ владелец).
+- `[IsAuthenticated(), IsOwner(), ~IsModer()]` — авторизованные, владелец, и не модератор.
+
+---
+
+## Тестирование в Postman
+
+1. Импортируй коллекцию `LMS_API_Postman_Collection.json` (лежит в корне проекта).
+2. Создай пользователя через `POST /api/users/`.
+3. Получи токены через `POST /api/login/`.
+4. Для защищённых запросов добавь заголовок:
+   ```
+   Authorization: Bearer <access_token>
+   ```
+5. Проверь сценарии:
+   - Обычный пользователь создаёт курс — в ответе должен быть `owner` с его ID.
+   - Обычный пользователь пытается отредактировать чужой курс — получает 403.
+   - Модератор (добавленный в группу через админку) может редактировать любой курс, но не может создать или удалить.
+
+---
+
+## Скрипты для заполнения базы
+
+- `load_data.py` — создаёт тестового пользователя (`user@test.com` / `test123`) и 3 курса с 9 уроками.
+- `check_admin.py` — проверяет наличие суперпользователя и создаёт при необходимости (`admin@test.com` / `admin123`).
+
+Запуск:
 ```bash
-pip install psycopg2
+python load_data.py
+python check_admin.py
 ```
 
 ---
-
-## 🔍 Полезные команды
-
-```bash
-# Проверка конфигурации проекта
-python manage.py check
-
-# Просмотр всех URL маршрутов
-python manage.py show_urls
-
-# Вход в Django shell
-python manage.py shell
-
-# Создание резервной копии БД
-python manage.py dumpdata > backup.json
-
-# Восстановление из резервной копии
-python manage.py loaddata backup.json
-
-# Удаление всех миграций (осторожно!)
-python manage.py migrate materials zero
-```
-
----
-
-## 📚 Документация
-
-- **Django:** https://docs.djangoproject.com/
-- **Django REST Framework:** https://www.django-rest-framework.org/
-- **Postman:** https://learning.postman.com/
-
----
-
-## 👤 Автор
-
-**Разработано для:** LMS курс на SkyPro  
-**Версия:** 1.0  
-**Дата:** 2026-08-14
-
----
-
-## 📌 Заметки
-
-- Все эндпоинты возвращают JSON формат
-- PATCH запросы позволяют обновлять только необходимые поля
-- Пароли пользователей автоматически хешируются
-- Для создания урока необходимо передать валидный ID курса
-- Статус коды соответствуют REST стандартам (200, 201, 204, 400, 404, 500)
-
----
-
-**Проект готов к использованию и оценке! ✅**

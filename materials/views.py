@@ -1,11 +1,11 @@
-from rest_framework import generics, viewsets
-
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from .models import Course, Lesson
 from .serializers import CourseDetailSerializer, CourseSerializer, LessonSerializer
-
+from .permissions import IsModer, IsOwner
 
 class CourseViewSet(viewsets.ModelViewSet):
-    queryset = Course.objects.prefetch_related('lessons')
+    queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
     def get_serializer_class(self):
@@ -13,28 +13,45 @@ class CourseViewSet(viewsets.ModelViewSet):
             return CourseDetailSerializer
         return CourseSerializer
 
+    def get_permissions(self):
+        if self.action == 'create':
+            return [IsAuthenticated(), ~IsModer()]
+        elif self.action == 'destroy':
+            return [IsAuthenticated(), IsOwner(), ~IsModer()]
+        elif self.action in ['update', 'partial_update']:
+            return [IsAuthenticated(), IsModer() | IsOwner()]
+        else:  # list, retrieve
+            return [IsAuthenticated()]
 
-class LessonListAPIView(generics.ListAPIView):
+    def get_queryset(self):
+        user = self.request.user
+        if user.groups.filter(name='moderators').exists():
+            return Course.objects.all()
+        return Course.objects.filter(owner=user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
 
+    def get_permissions(self):
+        if self.action == 'create':
+            return [IsAuthenticated(), ~IsModer()]
+        elif self.action == 'destroy':
+            return [IsAuthenticated(), IsOwner(), ~IsModer()]
+        elif self.action in ['update', 'partial_update']:
+            return [IsAuthenticated(), IsModer() | IsOwner()]
+        else:
+            return [IsAuthenticated()]
 
-class LessonRetrieveAPIView(generics.RetrieveAPIView):
-    queryset = Lesson.objects.all()
-    serializer_class = LessonSerializer
+    def get_queryset(self):
+        user = self.request.user
+        if user.groups.filter(name='moderators').exists():
+            return Lesson.objects.all()
+        return Lesson.objects.filter(owner=user)
 
-
-class LessonCreateAPIView(generics.CreateAPIView):
-    queryset = Lesson.objects.all()
-    serializer_class = LessonSerializer
-
-
-class LessonUpdateAPIView(generics.UpdateAPIView):
-    queryset = Lesson.objects.all()
-    serializer_class = LessonSerializer
-
-
-class LessonDestroyAPIView(generics.DestroyAPIView):
-    queryset = Lesson.objects.all()
-    serializer_class = LessonSerializer
-
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
