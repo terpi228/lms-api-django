@@ -19,7 +19,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
+
+from users.serializers import CustomTokenObtainPairSerializer
+from users.views import CustomTokenObtainPairView
 
 
 urlpatterns = [
@@ -27,9 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('materials.urls')),
     path('api/', include('users.urls')),
-    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/refresh/', TokenRefreshView.as_view, name='token_refresh'),
-
-
+    path('api/login/', CustomTokenObtainPairView.as_view(serializer_class=CustomTokenObtainPairSerializer), name='token_obtain_pair'),
+    path('api/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 

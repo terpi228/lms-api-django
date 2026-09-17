@@ -1,8 +1,15 @@
 from rest_framework.permissions import BasePermission
 
+
 class IsModer(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.groups.filter(name='moderators').exists()
+        return bool(request.user and request.user.is_authenticated and request.user.groups.filter(name='moderators').exists())
+
+
+class IsNotModer(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and not request.user.groups.filter(name='moderators').exists())
+
 
 class IsOwner(BasePermission):
     def has_object_permission(self, request, view, obj):

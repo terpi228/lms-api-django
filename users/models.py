@@ -78,7 +78,28 @@ class Payment(models.Model):
         verbose_name_plural = 'Платежи'
 
     def __str__(self):
-        return f'Платеж {self.amount} от {self.user.email}'
-
-    def __str__(self):
         return f'Оплата {self.amount} от {self.user.email}'
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name='Пользователь'
+    )
+    course = models.ForeignKey(
+        'materials.Course',
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name='Курс'
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'course'],
+                name='unique_subscription_user_course'
+            )
+        ]

@@ -32,3 +32,17 @@ class PaymentAPITest(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['payments']), 2)
+
+    def test_login_with_email_returns_tokens(self):
+        response = self.client.post('/api/login/', {'email': 'user@example.com', 'password': 'password'}, format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+
+    def test_create_payment_requires_authenticated_user(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post('/api/payments/', {'paid_course': self.course.id, 'amount': '150.00', 'payment_method': 'transfer'}, format='json')
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['user'], self.user.id)
