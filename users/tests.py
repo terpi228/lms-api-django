@@ -4,7 +4,7 @@ from rest_framework.test import APITestCase
 
 from materials.models import Course, Lesson
 
-from .models import Payment, User
+from .models import Payment, Subscription, User
 
 
 class UserAppConfigurationTest(SimpleTestCase):
@@ -46,3 +46,43 @@ class PaymentAPITest(APITestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['user'], self.user.id)
+
+
+class SubscriptionAPITest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='subscriber@example.com',
+            username='subscriber',
+            password='password',
+        )
+        self.course = Course.objects.create(title='Django', owner=self.user)
+
+    def test_subscription_toggles_and_is_returned_for_course(self):
+        self.client.force_authenticate(user=self.user)
+
+        add_response = self.client.post(
+            '/api/subscription/',
+            {'course': self.course.id},
+            format='json',
+        )
+        self.assertEqual(add_response.status_code, 200)
+        self.assertEqual(add_response.data['message'], 'Подписка добавлена')
+        self.assertTrue(Subscription.objects.filter(user=self.user, course=self.course).exists())
+
+        detail_response = self.client.get(f'/api/courses/{self.course.id}/')
+        self.assertTrue(detail_response.data['is_subscribed'])
+
+        remove_response = self.client.post(
+            '/api/subscription/',
+            {'course': self.course.id},
+            format='json',
+        )
+        self.assertEqual(remove_response.status_code, 200)
+        self.assertEqual(remove_response.data['message'], 'Подписка удалена')
+        self.assertFalse(Subscription.objects.filter(user=self.user, course=self.course).exists())
+
+    def test_anonymous_course_response_is_not_subscribed(self):
+        response = self.client.get(f'/api/courses/{self.course.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data['is_subscribed'])
