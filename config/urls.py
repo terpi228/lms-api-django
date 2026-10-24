@@ -23,6 +23,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from users.serializers import CustomTokenObtainPairSerializer
 from users.views import CustomTokenObtainPairView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 
 urlpatterns = [
@@ -32,5 +33,11 @@ urlpatterns = [
     path('api/', include('users.urls')),
     path('api/login/', CustomTokenObtainPairView.as_view(serializer_class=CustomTokenObtainPairSerializer), name='token_obtain_pair'),
     path('api/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path(
+        'api/docs/',
+        SpectacularSwaggerView.as_view(url_name='schema'),
+        name='swagger-ui'
+    )
 ]
 

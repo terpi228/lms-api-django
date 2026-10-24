@@ -8,8 +8,33 @@ from .models import Payment, User
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = ('id', 'user', 'payment_date', 'paid_course', 'paid_lesson', 'amount', 'payment_method')
-        read_only_fields = ('user', 'payment_date')
+        fields = ('id', 
+                  'user',
+                  'payment_date',
+                  'paid_course',
+                  'paid_lesson',
+                  'amount',
+                  'payment_method',
+                  'stripe_product_id',
+                  'stripe_price_id',
+                  'stripe_session_id',
+                  'payment_url',
+                ) 
+        read_only_fields = (
+                'user',
+                'payment_date',
+                'stripe_product_id',
+                'stripe_price_id',
+                'stripe_session_id',
+                'payment_url',
+                )
+
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError(
+                "Сумма платежа должна быть больше нуля."
+            )
+        return value
 
     def validate(self, data):
         paid_course = data.get('paid_course', getattr(self.instance, 'paid_course', None))
@@ -58,3 +83,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'access': str(refresh.access_token),
         }
         return data
+
+class SubscriptionSerializer(serializers.Serializer):
+    course = serializers.IntegerField(min_value = 1)
+
+class SubscriptionResponseSerializer(serializers.Serializer):
+    message = serializers.CharField()
+
+class ErrorResponseSerializer(serializers.Serializer):
+    detail=serializers.CharField()

@@ -23,6 +23,7 @@ load_dotenv(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-n**nxjsre@z8r0itg)^=!7u8bb$y4l+_f!+xk5udte*0m$c%*7')
+STRIPE_SECRET_CODE = os.getenv('STRIPE_SECRET_CODE')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'users',
     'materials',
     'rest_framework_simplejwt',
+    'drf_spectacular',
 
 ]
 
@@ -147,6 +149,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Email

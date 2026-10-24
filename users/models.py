@@ -71,8 +71,20 @@ class Payment(models.Model):
         verbose_name='Оплаченный урок'
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_method = models.CharField(max_length=20, choices=[('cash', 'Наличные'), ('transfer', 'Перевод')])
-
+    payment_method = models.CharField(
+        max_length=20,
+        choices=[
+            ('cash', 'Наличные'),
+            ('transfer', 'Перевод'),
+            ('stripe', 'Stripe'),
+        ],
+    )
+    stripe_product_id = models.CharField(max_length=255, blank=True)
+    stripe_price_id = models.CharField(max_length=255, blank=True)
+    stripe_session_id = models.CharField(max_length=255, blank=True)
+    payment_url = models.URLField(max_length=2048, blank=True)
+    
+    
     class Meta:
         verbose_name = 'Платеж'
         verbose_name_plural = 'Платежи'

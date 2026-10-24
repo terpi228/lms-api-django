@@ -7,7 +7,18 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from materials.models import Course
 from .models import Payment, User, Subscription
-from .serializers import CustomTokenObtainPairSerializer, PaymentSerializer, UserSerializer
+from .serializers import (
+    CustomTokenObtainPairSerializer,
+    PaymentSerializer,
+    UserSerializer,
+    SubscriptionSerializer,
+    SubscriptionResponseSerializer,
+    ErrorResponseSerializer,
+)
+from drf_spectacular.utils import extend_schema
+from .services import create_stripe_checkout
+from stripe import StripeError
+from rest_framework.exceptions import APIException
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -23,7 +34,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAuthenticated()]
 
-
+class StripeServiceError(APIException):
+    status_code = 502
+    default_detail = "Не удалось создать оплату через Stripe."
+    default_code = "stripe_error"
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
@@ -37,8 +51,32 @@ class PaymentViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAuthenticated()]
 
+    def perform_create(self, serializer):
+        data = serializer.validated_data
+        stripe_data = {}
+
+        if data["payment_method"] == "stripe":
+            course = data.get("paid_course") or data.get("paid_lesson")
+
+            try:
+                stripe_data = create_stripe_checkout(
+                    course,
+                    data["amount"],
+                )
+            except StripeError as exc:
+                raise StripeServiceError() from exc
+
+        serializer.save(**stripe_data)
+
 class SubscriptionAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=SubscriptionSerializer,
+        responses={200: SubscriptionResponseSerializer,
+                   401: ErrorResponseSerializer,
+                   404: ErrorResponseSerializer},
+    )
 
     def post(self, request):
         user = request.user
