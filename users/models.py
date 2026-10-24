@@ -51,3 +51,67 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class Payment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
+    payment_date = models.DateTimeField(auto_now_add=True)
+    paid_course = models.ForeignKey(
+        'materials.Course',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Оплаченный курс'
+    )
+    paid_lesson = models.ForeignKey(
+        'materials.Lesson',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Оплаченный урок'
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(
+        max_length=20,
+        choices=[
+            ('cash', 'Наличные'),
+            ('transfer', 'Перевод'),
+            ('stripe', 'Stripe'),
+        ],
+    )
+    stripe_product_id = models.CharField(max_length=255, blank=True)
+    stripe_price_id = models.CharField(max_length=255, blank=True)
+    stripe_session_id = models.CharField(max_length=255, blank=True)
+    payment_url = models.URLField(max_length=2048, blank=True)
+    
+    
+    class Meta:
+        verbose_name = 'Платеж'
+        verbose_name_plural = 'Платежи'
+
+    def __str__(self):
+        return f'Оплата {self.amount} от {self.user.email}'
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name='Пользователь'
+    )
+    course = models.ForeignKey(
+        'materials.Course',
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name='Курс'
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'course'],
+                name='unique_subscription_user_course'
+            )
+        ]
