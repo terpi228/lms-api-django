@@ -7,7 +7,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from materials.models import Course
 from .models import Payment, User, Subscription
-from .serializers import CustomTokenObtainPairSerializer, PaymentSerializer, UserSerializer
+from .serializers import (
+    CustomTokenObtainPairSerializer,
+    PaymentSerializer,
+    UserSerializer,
+    SubscriptionSerializer,
+    SubscriptionResponseSerializer,
+    ErrorResponseSerializer,
+)
+from drf_spectacular.utils import extend_schema
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -39,6 +47,13 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
 class SubscriptionAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=SubscriptionSerializer,
+        responses={200: SubscriptionResponseSerializer,
+                   401: ErrorResponseSerializer,
+                   404: ErrorResponseSerializer},
+    )
 
     def post(self, request):
         user = request.user

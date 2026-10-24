@@ -58,3 +58,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'access': str(refresh.access_token),
         }
         return data
+
+class SubscriptionSerializer(serializers.Serializer):
+    course = serializers.IntegerField(min_value = 1)
+
+class SubscriptionResponseSerializer(serializers.Serializer):
+    message = serializers.CharField()
+
+class ErrorResponseSerializer(serializers.Serializer):
+    detail=serializers.CharField()

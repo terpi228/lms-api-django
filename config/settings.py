@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users',
     'materials',
     'rest_framework_simplejwt',
+    'drf_spectacular',
 
 ]
 
@@ -147,6 +148,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Email

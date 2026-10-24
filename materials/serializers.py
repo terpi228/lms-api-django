@@ -27,10 +27,10 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = '__all__'
 
-    def get_lessons_count(self, obj):
+    def get_lessons_count(self, obj) -> int:
         return obj.lessons.count()
 
-    def get_is_subscribed(self, obj):
+    def get_is_subscribed(self, obj) -> bool:
         request = self.context.get('request')
 
         if not request or not request.user.is_authenticated:
@@ -59,10 +59,10 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             'is_subscribed',
         )
 
-    def get_lessons_count(self, obj):
+    def get_lessons_count(self, obj) -> int:
         return obj.lessons.count()
 
-    def get_is_subscribed(self, obj):
+    def get_is_subscribed(self, obj) -> bool:
         request = self.context.get('request')
 
         if not request or not request.user.is_authenticated:
